@@ -3,30 +3,9 @@ packages:
 
 allowBuilds:
   esbuild: true
+  '@esbuild/*': true
+  '@tailwindcss/oxide': true
+  '@tailwindcss/oxide-*': true
   sharp: true
-  '@img/sharp-libvips-linux-x64': true
-  '@img/sharp-linux-x64': true
-  '@img/sharp-darwin-arm64': true
-  '@img/sharp-darwin-x64': true
-  '@img/sharp-linux-arm64': true
-  '@img/sharp-linux-arm': true
-  '@img/sharp-win32-x64': true
-  '@img/sharp-win32-arm64': true
-  '@img/sharp-win32-ia32': true
-  '@img/sharp-linuxmusl-arm64': true
-  '@img/sharp-linuxmusl-x64': true
-  '@img/sharp-linux-s390x': true
-  '@img/sharp-linux-ppc64': true
-  '@img/sharp-linux-riscv64': true
-  '@img/sharp-libvips-darwin-arm64': true
-  '@img/sharp-libvips-darwin-x64': true
-  '@img/sharp-libvips-linux-arm': true
-  '@img/sharp-libvips-linux-arm64': true
-  '@img/sharp-libvips-linux-ppc64': true
-  '@img/sharp-libvips-linux-riscv64': true
-  '@img/sharp-libvips-linux-s390x': true
-  '@img/sharp-libvips-linuxmusl-arm64': true
-  '@img/sharp-libvips-linuxmusl-x64': true
-  '@img/sharp-freebsd-wasm32': true
-  '@img/sharp-wasm32': true
-  '@img/sharp-webcontainers-wasm32': true
+  '@img/sharp-*': true
+  fsevents: true
