@@ -1,0 +1,14 @@
+---
+import Logo from './Logo.astro';
+interface Props { eyebrow: string; title: string; intro: string; }
+const { eyebrow, title, intro } = Astro.props;
+---
+<section class="bg-emerald-deep text-white">
+  <div class="section-shell py-12 sm:py-16">
+    <div class="mb-10"><Logo /></div>
+    <p class="text-xs font-bold uppercase tracking-[0.26em] text-gold-soft">{eyebrow}</p>
+    <h1 class="mt-4 max-w-4xl font-display text-4xl font-bold tracking-tight sm:text-6xl">{title}</h1>
+    <p class="mt-5 max-w-3xl text-base leading-8 text-white/74 sm:text-lg">{intro}</p>
+    <a href="/" class="mt-7 inline-flex rounded-full border border-white/25 px-4 py-2 text-sm font-semibold text-white hover:border-gold-soft hover:text-gold-soft">← Kembali ke panduan utama</a>
+  </div>
+</section>

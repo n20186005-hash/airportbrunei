@@ -1,0 +1,41 @@
+---
+import Logo from './Logo.astro';
+import { officialSources, siteInfo } from '../data/site';
+---
+<footer class="mt-20 bg-emerald-deep text-white">
+  <div class="section-shell py-12">
+    <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+      <div>
+        <Logo light={true} />
+        <p class="mt-5 max-w-md text-sm leading-7 text-white/70">
+          Panduan berorientasikan pelawat untuk memahami lapangan terbang, perjalanan masuk ke Bandar Seri Begawan dan konteks warisan Brunei secara neutral.
+        </p>
+      </div>
+      <div class="grid gap-7 sm:grid-cols-2">
+        <div>
+          <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-gold-soft">Dasar & tetapan</h2>
+          <nav class="mt-4 flex flex-col gap-3 text-sm">
+            <a class="text-white/80 hover:text-white" href="/dasar-privasi/">Dasar Privasi</a>
+            <a class="text-white/80 hover:text-white" href="/terma-perkhidmatan/">Terma Perkhidmatan</a>
+            <a class="text-white/80 hover:text-white" href="/tetapan-kuki/">Tetapan Kuki</a>
+          </nav>
+        </div>
+        <div>
+          <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-gold-soft">Sumber institusi</h2>
+          <div class="mt-4 flex flex-col gap-3 text-sm">
+            {officialSources.map((source) => (
+              <a class="text-white/80 hover:text-white" href={source.href} target="_blank" rel="noreferrer">{source.label}</a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-10 border-t border-white/12 pt-7 text-xs leading-6 text-white/64">
+      <p>Laman ini ialah projek panduan maklumat pelawat bebas dan bukan untung, dan tidak mempunyai hubungan pentadbiran dengan mana-mana agensi kerajaan atau organisasi rasmi.</p>
+      <p class="mt-2">Maklumat mengenai lokasi dan perkhidmatan dirujuk silang dengan bahan awam Jabatan Bandaran Bandar Seri Begawan, Jabatan Kemajuan Pelancongan di bawah Kementerian Ekonomi, Perdagangan dan Industri, Brunei Tourism Board, serta Jabatan Penerbangan Awam Brunei Darussalam. Kandungan ini tidak mengandungi syor komersial berbayar.</p>
+      <p class="mt-2">Hak cipta dan hak milik foto yang dipaparkan kekal pada jurugambar asal masing-masing; butiran atribusi disediakan pada bahagian kredit imej.</p>
+      <p class="mt-4 font-semibold text-white">© 2026 {siteInfo.name}. Hak cipta terpelihara.</p>
+    </div>
+  </div>
+</footer>

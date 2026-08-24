@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Noto Sans", "Segoe UI", Arial, sans-serif;
+  --font-display: "Georgia", "Times New Roman", serif;
+  --color-emerald-brunei: #0c4a3b;
+  --color-emerald-deep: #062f27;
+  --color-gold-brunei: #d8b24b;
+  --color-gold-soft: #f4d985;
+  --color-ivory: #f8f4e9;
+  --color-ink: #16312d;
+  --color-sky-soft: #dfeff3;
+}
+
+:root {
+  color-scheme: light;
+  background: #f8f4e9;
+  color: #16312d;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6.5rem;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(216, 178, 75, 0.08), transparent 32rem),
+    radial-gradient(circle at 92% 28%, rgba(12, 74, 59, 0.08), transparent 28rem),
+    #f8f4e9;
+  font-family: var(--font-sans);
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+::selection {
+  background: #d8b24b;
+  color: #062f27;
+}
+
+.focus-ring:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #d8b24b;
+  outline-offset: 3px;
+}
+
+.section-shell {
+  width: min(1180px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.glass {
+  background: rgba(248, 244, 233, 0.86);
+  backdrop-filter: blur(14px);
+}
+
+.card-shadow {
+  box-shadow: 0 20px 60px rgba(6, 47, 39, 0.10);
+}
+
+.airport-grid {
+  background-image:
+    linear-gradient(rgba(12, 74, 59, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(12, 74, 59, 0.055) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.prose-legal h2 {
+  margin-top: 2.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.7vw, 2rem);
+  color: #062f27;
+}
+
+.prose-legal h3 {
+  margin-top: 1.5rem;
+  font-weight: 700;
+  color: #0c4a3b;
+}
+
+.prose-legal p,
+.prose-legal li {
+  line-height: 1.8;
+  color: #36544f;
+}
+
+.prose-legal ul {
+  margin: 0.75rem 0 1.25rem 1.25rem;
+  list-style: disc;
+}
+
+.map-frame {
+  filter: saturate(0.82) contrast(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalHero from '../components/LegalHero.astro';
+const title = 'Dasar Privasi — Panduan Lapangan Terbang Antarabangsa Brunei';
+const description = 'Dasar privasi projek Panduan BWN, termasuk data minimum, Google Maps, Google Analytics, hak pengguna dan pilihan kuki.';
+---
+<BaseLayout title={title} description={description} hideNav={true}>
+  <LegalHero eyebrow="Dasar laman" title="Dasar Privasi" intro="Kami mengamalkan prinsip pengumpulan data minimum untuk sebuah projek maklumat pelawat bebas dan bukan untung." />
+  <article class="section-shell prose-legal max-w-4xl py-14 sm:py-20">
+    <p class="rounded-2xl border border-gold-brunei/35 bg-gold-soft/22 p-5 text-sm"><strong>Kemas kini terakhir: Ogos 2026.</strong> Dasar ini menerangkan data yang mungkin diproses apabila anda menggunakan laman ini. Ia bukan notis privasi bagi Jabatan Penerbangan Awam, Google atau mana-mana organisasi lain.</p>
+
+    <h2>Maklumat yang kami kumpulkan</h2>
+    <p>Kami berusaha mengumpulkan hanya data minimum yang diperlukan untuk menyediakan dan memperbaiki laman. Bergantung pada konfigurasi hos dan pilihan kuki anda, data mungkin termasuk:</p>
+    <ul>
+      <li>data teknikal pelayaran seperti alamat IP, jenis pelayar, peranti, halaman yang dilawati dan masa permintaan;</li>
+      <li>kuki atau teknologi storan setempat yang diperlukan untuk menyimpan pilihan anda;</li>
+      <li>data penggunaan tanpa pengenalan langsung jika anda memilih untuk mengaktifkan analitik;</li>
+      <li>maklumat yang anda sendiri berikan secara sukarela melalui saluran hubungan yang dinyatakan oleh laman, jika saluran tersebut disediakan pada masa hadapan.</li>
+    </ul>
+    <p>Laman ini tidak menyediakan akaun pengguna, pangkalan data profil, log masuk atau CMS awam.</p>
+
+    <h2>Bagaimana maklumat digunakan</h2>
+    <p>Data yang dibenarkan digunakan untuk menjaga keselamatan dan kebolehgunaan laman, memahami corak trafik secara agregat, memperbaiki kandungan dan pengalaman pengguna, menjawab pertanyaan yang dihantar secara sukarela, serta memenuhi kewajipan undang-undang yang terpakai.</p>
+
+    <h2>Google Analytics</h2>
+    <p>Google Analytics 4 hanya dimuatkan selepas anda mengaktifkan kategori analitik pada halaman <a href="/tetapan-kuki/">Tetapan Kuki</a>. Pilihan analitik adalah tidak aktif secara lalai pada laman ini. Kami mengkonfigurasi analitik dengan peminimuman data yang munasabah, termasuk permintaan penganoniman IP apabila disokong.</p>
+
+    <h2>Google Maps</h2>
+    <p>Halaman utama mengandungi peta Google yang dibenamkan secara malas. Apabila iframe peta dimuatkan, Google mungkin menerima data teknikal seperti alamat IP, maklumat pelayar, rujukan halaman dan interaksi peta. Pemprosesan tersebut tertakluk kepada terma serta dasar privasi Google, bukan kepada kawalan penuh laman ini.</p>
+
+    <h2>Imej dan sumber pihak ketiga</h2>
+    <p>Foto utama yang digunakan oleh laman ini berasal daripada Wikimedia Commons dan disimpan secara tempatan mengikut lesen terbuka masing-masing. Memuatkan foto tempatan ini tidak memerlukan sambungan terus ke Wikimedia pada setiap paparan halaman. Pautan sumber hanya dibuka jika anda memilih untuk melawatnya.</p>
+
+    <h2>Pengehosan dan log keselamatan</h2>
+    <p>Laman direka untuk dikerahkan melalui Cloudflare Workers/Static Assets. Penyedia pengehosan mungkin memproses log rangkaian dan keselamatan yang diperlukan untuk menghantar kandungan, mencegah penyalahgunaan dan mengekalkan kebolehpercayaan perkhidmatan, tertakluk kepada dasar mereka sendiri.</p>
+
+    <h2>Tempoh penyimpanan</h2>
+    <p>Kami tidak menetapkan tempoh penyimpanan yang lebih lama daripada yang diperlukan untuk tujuan teknikal, keselamatan, analitik yang telah dipersetujui atau pematuhan undang-undang. Tetapan kuki anda disimpan pada peranti melalui storan setempat sehingga anda menukarnya atau mengosongkan data pelayar.</p>
+
+    <h2>Hak anda</h2>
+    <p>Bergantung pada undang-undang yang terpakai kepada anda, termasuk prinsip GDPR apabila relevan, anda mungkin mempunyai hak untuk:</p>
+    <ul>
+      <li>meminta akses kepada data peribadi yang berkaitan dengan anda;</li>
+      <li>meminta pembetulan atau pemadaman dalam keadaan yang dibenarkan undang-undang;</li>
+      <li>membantah atau mengehadkan pemprosesan tertentu;</li>
+      <li>menarik balik persetujuan untuk analitik pada bila-bila masa melalui Tetapan Kuki;</li>
+      <li>membuat aduan kepada pihak berkuasa perlindungan data yang berkenaan.</li>
+    </ul>
+
+    <h2>Kanak-kanak</h2>
+    <p>Laman ini ialah bahan maklumat perjalanan umum dan tidak direka untuk mengumpulkan data peribadi kanak-kanak secara sengaja. Kami tidak menyediakan fungsi akaun, profil atau pengiklanan berasaskan minat.</p>
+
+    <h2>Perubahan kepada dasar ini</h2>
+    <p>Kami boleh mengemas kini dasar apabila fungsi laman, penyedia teknikal atau kewajipan undang-undang berubah. Tarikh kemas kini akan dipaparkan pada halaman ini dan perubahan penting akan ditulis dengan bahasa yang jelas.</p>
+  </article>
+</BaseLayout>

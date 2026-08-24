@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalHero from '../components/LegalHero.astro';
+const title = 'Tetapan Kuki — Panduan Lapangan Terbang Antarabangsa Brunei';
+const description = 'Urus kuki dan pilihan analitik untuk Panduan BWN. Analitik tidak aktif secara lalai dan boleh diubah pada bila-bila masa.';
+---
+<BaseLayout title={title} description={description} hideNav={true}>
+  <LegalHero eyebrow="Kawalan privasi" title="Tetapan Kuki" intro="Analitik tidak aktif secara lalai. Anda boleh memilih kategori yang dibenarkan dan mengubah pilihan pada bila-bila masa." />
+  <section class="section-shell max-w-4xl py-14 sm:py-20">
+    <div class="prose-legal">
+      <p class="rounded-2xl border border-gold-brunei/35 bg-gold-soft/22 p-5 text-sm"><strong>Kemas kini terakhir: Ogos 2026.</strong> Laman ini menggunakan storan setempat untuk menyimpan pilihan anda. Kategori yang tidak diperlukan kekal tidak aktif sehingga anda memilihnya.</p>
+
+      <h2>Apa itu kuki dan storan setempat?</h2>
+      <p>Kuki ialah data kecil yang boleh disimpan oleh pelayar atau perkhidmatan pihak ketiga. Laman ini juga menggunakan <em>localStorage</em> untuk menyimpan pilihan persetujuan pada peranti anda. Mengosongkan data pelayar akan menetapkan semula pilihan tersebut.</p>
+    </div>
+
+    <form id="cookie-form" class="mt-10 space-y-4" aria-describedby="cookie-status">
+      <label class="flex items-start justify-between gap-5 rounded-2xl border border-emerald-brunei/14 bg-white/72 p-5">
+        <span><strong class="block text-emerald-deep">Kuki perlu</strong><span class="mt-1 block text-sm leading-6 text-ink/60">Fungsi asas dan keselamatan teknikal. Kategori ini tidak boleh dimatikan melalui tetapan laman.</span></span>
+        <input type="checkbox" checked disabled class="mt-1 h-5 w-5 accent-emerald-brunei" />
+      </label>
+
+      <label class="flex items-start justify-between gap-5 rounded-2xl border border-emerald-brunei/14 bg-white/72 p-5">
+        <span><strong class="block text-emerald-deep">Analitik — Google Analytics</strong><span class="mt-1 block text-sm leading-6 text-ink/60">Membantu kami memahami penggunaan laman secara agregat. Skrip GA4 hanya dimuatkan selepas pilihan ini diaktifkan.</span></span>
+        <input id="analytics" type="checkbox" class="mt-1 h-5 w-5 accent-emerald-brunei" />
+      </label>
+
+      <label class="flex items-start justify-between gap-5 rounded-2xl border border-emerald-brunei/14 bg-white/72 p-5">
+        <span><strong class="block text-emerald-deep">Keutamaan</strong><span class="mt-1 block text-sm leading-6 text-ink/60">Menyimpan pilihan laman pada peranti, seperti keutamaan antaramuka yang mungkin ditambah pada masa hadapan.</span></span>
+        <input id="preferences" type="checkbox" class="mt-1 h-5 w-5 accent-emerald-brunei" />
+      </label>
+
+      <label class="flex items-start justify-between gap-5 rounded-2xl border border-emerald-brunei/14 bg-white/50 p-5 opacity-75">
+        <span><strong class="block text-emerald-deep">Pemasaran / iklan diperibadikan</strong><span class="mt-1 block text-sm leading-6 text-ink/60">Tidak digunakan oleh projek bukan untung ini. Tiada fungsi pengiklanan berasaskan minat disediakan.</span></span>
+        <input type="checkbox" disabled class="mt-1 h-5 w-5" />
+      </label>
+
+      <div class="flex flex-wrap gap-3 pt-3">
+        <button type="submit" class="rounded-full bg-emerald-deep px-5 py-3 text-sm font-extrabold text-white hover:bg-emerald-brunei">Simpan pilihan</button>
+        <button id="reject-all" type="button" class="rounded-full border border-emerald-brunei/25 bg-white px-5 py-3 text-sm font-extrabold text-emerald-deep hover:border-emerald-brunei">Tolak semua yang pilihan</button>
+      </div>
+      <p id="cookie-status" role="status" class="min-h-6 text-sm font-semibold text-emerald-brunei"></p>
+    </form>
+
+    <div class="prose-legal mt-12">
+      <h2>Google Maps</h2>
+      <p>Peta pada halaman utama ialah iframe pihak ketiga dan bukan kategori analitik laman. Apabila anda membuka halaman utama dan peta dimuatkan, Google boleh memproses data teknikal mengikut dasar mereka. Jika anda mahu mengelakkan sambungan tersebut, jangan membuka/berinteraksi dengan peta atau gunakan tetapan privasi pelayar yang menyekat kandungan pihak ketiga.</p>
+
+      <h2>Menukar persetujuan</h2>
+      <p>Anda boleh kembali ke halaman ini bila-bila masa. Menyahaktifkan analitik menghalang pemuatan GA4 pada lawatan seterusnya; jika GA4 sudah dimuatkan pada halaman semasa, muat semula halaman selepas menyimpan pilihan baharu.</p>
+    </div>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const key = 'bwn-cookie-preferences';
+      const form = document.getElementById('cookie-form');
+      const analytics = document.getElementById('analytics');
+      const preferences = document.getElementById('preferences');
+      const rejectAll = document.getElementById('reject-all');
+      const status = document.getElementById('cookie-status');
+
+      const read = () => {
+        try { return JSON.parse(localStorage.getItem(key) || '{}'); }
+        catch (_) { return {}; }
+      };
+      const write = (value) => {
+        localStorage.setItem(key, JSON.stringify(value));
+        window.dispatchEvent(new CustomEvent('bwn-consent-updated', { detail: value }));
+      };
+      const current = read();
+      analytics.checked = current.analytics === true;
+      preferences.checked = current.preferences === true;
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const value = { analytics: analytics.checked, preferences: preferences.checked, marketing: false };
+        write(value);
+        status.textContent = 'Pilihan anda telah disimpan pada peranti ini.';
+      });
+
+      rejectAll.addEventListener('click', () => {
+        analytics.checked = false;
+        preferences.checked = false;
+        write({ analytics: false, preferences: false, marketing: false });
+        status.textContent = 'Semua kategori pilihan telah dimatikan.';
+      });
+    })();
+  </script>
+</BaseLayout>

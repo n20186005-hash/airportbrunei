@@ -1,0 +1,23 @@
+---
+interface Props {
+  compact?: boolean;
+  light?: boolean;
+}
+const { compact = false, light = false } = Astro.props;
+---
+<a href="/" class="inline-flex items-center gap-3 no-underline" aria-label="Ke laman utama Panduan BWN">
+  <svg width={compact ? 42 : 52} height={compact ? 42 : 52} viewBox="0 0 64 64" role="img" aria-label="Lambang Panduan BWN" class="shrink-0">
+    <circle cx="32" cy="32" r="29" fill={light ? '#f4d985' : '#0c4a3b'} />
+    <path d="M13 37c5-13 14-20 19-20s14 7 19 20" fill="none" stroke={light ? '#062f27' : '#f4d985'} stroke-width="4" stroke-linecap="round" />
+    <path d="M18 41h28" stroke={light ? '#062f27' : '#f4d985'} stroke-width="4" stroke-linecap="round" />
+    <path d="M32 20v23" stroke={light ? '#062f27' : '#f4d985'} stroke-width="3" stroke-linecap="round" />
+    <path d="M32 45v8" stroke={light ? '#062f27' : '#f4d985'} stroke-width="3" stroke-dasharray="2 4" stroke-linecap="round" />
+    <circle cx="32" cy="13" r="3.2" fill={light ? '#062f27' : '#f4d985'} />
+  </svg>
+  {!compact && (
+    <span class="leading-tight">
+      <strong class:list={["block text-[0.92rem] font-extrabold tracking-wide", light ? "text-emerald-deep" : "text-white"]}>PANDUAN BWN</strong>
+      <span class:list={["block text-[0.68rem] tracking-[0.18em]", light ? "text-emerald-brunei" : "text-gold-soft"]}>BANDAR SERI BEGAWAN</span>
+    </span>
+  )}
+</a>

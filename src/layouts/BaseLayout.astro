@@ -1,0 +1,91 @@
+---
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import Logo from '../components/Logo.astro';
+import { siteInfo } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  imagePath?: string;
+  hideNav?: boolean;
+}
+
+const { title, description, imagePath = '/images/bwn-hero.webp', hideNav = false } = Astro.props;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : undefined;
+---
+<!doctype html>
+<html lang="ms-BN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#0c4a3b" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <title>{title}</title>
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/icons/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ms_BN" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <script is:inline define:vars={{ gaId: siteInfo.gaId }}>
+      (() => {
+        const key = 'bwn-cookie-preferences';
+        const loadAnalytics = () => {
+          if (document.querySelector('script[data-bwn-ga]')) return;
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+          script.dataset.bwnGa = 'true';
+          document.head.appendChild(script);
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function(){ window.dataLayer.push(arguments); };
+          window.gtag('js', new Date());
+          window.gtag('config', gaId, { anonymize_ip: true });
+        };
+        try {
+          const prefs = JSON.parse(localStorage.getItem(key) || '{}');
+          if (prefs.analytics === true) loadAnalytics();
+        } catch (_) {
+          // Analitik kekal tidak aktif jika pilihan tidak dapat dibaca.
+        }
+        window.addEventListener('bwn-consent-updated', (event) => {
+          if (event.detail?.analytics === true) loadAnalytics();
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    {!hideNav && (
+      <header class="sticky top-0 z-50 border-b border-white/10 bg-emerald-deep/95 text-white backdrop-blur">
+        <div class="section-shell flex min-h-20 items-center justify-between gap-6 py-3">
+          <Logo />
+          <nav aria-label="Navigasi utama" class="hidden items-center gap-5 text-sm font-semibold lg:flex">
+            <a href="/#sejarah" class="text-white/78 hover:text-white">Sejarah</a>
+            <a href="/#panduan" class="text-white/78 hover:text-white">Panduan</a>
+            <a href="/#pengangkutan" class="text-white/78 hover:text-white">Pengangkutan</a>
+            <a href="/#kemudahan" class="text-white/78 hover:text-white">Kemudahan</a>
+            <a href="/#sekitar" class="text-white/78 hover:text-white">Sekitar BSB</a>
+            <a href="/#faq" class="text-white/78 hover:text-white">FAQ</a>
+          </nav>
+          <a href="/#peta" class="rounded-full bg-gold-brunei px-4 py-2.5 text-sm font-extrabold text-emerald-deep shadow-sm hover:bg-gold-soft">Lihat peta</a>
+        </div>
+      </header>
+    )}
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
