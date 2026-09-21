@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LegalHero from '../components/LegalHero.astro';
-const title = 'Dasar Privasi — Panduan Lapangan Terbang Antarabangsa Brunei';
+import { withSiteName } from '../data/site';
+const title = withSiteName('Dasar Privasi');
 const description = 'Dasar privasi projek Panduan BWN, termasuk data minimum, Google Maps, Google Analytics, hak pengguna dan pilihan kuki.';
 ---
 <BaseLayout title={title} description={description} hideNav={true}>

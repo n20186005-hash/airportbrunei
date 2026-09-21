@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LegalHero from '../components/LegalHero.astro';
-const title = 'Tetapan Kuki — Panduan Lapangan Terbang Antarabangsa Brunei';
+import { withSiteName } from '../data/site';
+const title = withSiteName('Tetapan Kuki');
 const description = 'Urus kuki dan pilihan analitik untuk Panduan BWN. Analitik tidak aktif secara lalai dan boleh diubah pada bila-bila masa.';
 ---
 <BaseLayout title={title} description={description} hideNav={true}>

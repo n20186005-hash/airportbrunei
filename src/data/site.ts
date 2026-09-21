@@ -1,3 +1,9 @@
+// Nama laman SEO seragam: "Nama tarikan + Bandar + Panduan Pelancongan".
+// Digunakan sebagai title laman utama, og:site_name, dan akhiran denganSiteName() pada sublaman.
+export const SITE_NAME = 'Lapangan Terbang Antarabangsa Brunei Bandar Seri Begawan — Panduan Pelancongan';
+
+export const withSiteName = (pageTitle: string): string => `${pageTitle} | ${SITE_NAME}`;
+
 export const siteInfo = {
   name: 'Panduan Lapangan Terbang Antarabangsa Brunei',
   shortName: 'Panduan BWN',

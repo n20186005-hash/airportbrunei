@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { officialSources, siteInfo } from '../data/site';
+import { officialSources, siteInfo, SITE_NAME } from '../data/site';
 
-const title = 'Lapangan Terbang Antarabangsa Brunei — Panduan BWN Bandar Seri Begawan';
-const description = 'Panduan bebas dan bukan untung tentang Lapangan Terbang Antarabangsa Brunei (BWN): sejarah, kemudahan, pengangkutan ke Bandar Seri Begawan, parkir, peta, tempat menarik dan FAQ.';
+const title = SITE_NAME;
+const description = 'Panduan bebas dan bukan untung tentang Lapangan Terbang Antarabangsa Brunei (Brunei International Airport, BWN/WBSB): sejarah, kemudahan, pengangkutan ke Bandar Seri Begawan, parkir, peta, tempat menarik dan FAQ.';
 const canonical = Astro.site ? new URL('/', Astro.site).href : undefined;
 const heroImage = Astro.site ? new URL('/images/bwn-hero.webp', Astro.site).href : undefined;
 

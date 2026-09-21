@@ -2,9 +2,9 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-// Tetapkan URL produksi sebenar hanya di sini apabila domain sudah tersedia.
-// Biarkan kosong semasa pembangunan. Canonical/OG/sitemap akan turun taraf dengan selamat.
-const site = '';
+// URL produksi sebenar. Bila diisi, canonical/OG mutlak, sitemap dan
+// arahan Sitemap dalam robots.txt dijana secara automatik.
+const site = 'https://airportbrunei.com';
 
 export default defineConfig({
   site: site || undefined,

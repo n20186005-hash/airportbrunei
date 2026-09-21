@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LegalHero from '../components/LegalHero.astro';
-const title = 'Terma Perkhidmatan — Panduan Lapangan Terbang Antarabangsa Brunei';
+import { withSiteName } from '../data/site';
+const title = withSiteName('Terma Perkhidmatan');
 const description = 'Terma penggunaan untuk projek panduan pelawat bebas dan bukan untung mengenai Lapangan Terbang Antarabangsa Brunei.';
 ---
 <BaseLayout title={title} description={description} hideNav={true}>
