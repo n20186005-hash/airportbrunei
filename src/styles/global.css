@@ -106,3 +106,11 @@ input:focus-visible {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Keep navigation and credits usable on narrow screens and legal pages. */
+.site-nav a, header a, button, summary { min-height:44px; }
+.site-nav a { display:inline-flex; align-items:center; }
+.grid > *, .site-header > * { min-width:0; }
+h1,h2,h3,p,dd,a { overflow-wrap:anywhere; }
+@media(max-width:1023px){ .site-nav{order:3;flex-basis:100%;} .site-header{gap:.5rem;} }
+@media(max-width:639px){ section:first-child > div:last-child.absolute{position:relative;bottom:auto;right:auto;border-radius:0;padding:1rem;font-size:.75rem;} }
