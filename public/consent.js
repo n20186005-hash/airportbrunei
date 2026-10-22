@@ -14,7 +14,7 @@
   function clearDeny(){
     // Verify this tab's refusal is clear before publishing a shared grant.
     sessionStorage.removeItem(DENY);
-    if(sessionStorage.getItem(DENY)==='1')throw Error('Session refusal remains');
+    if(sessionStorage.getItem(DENY)!==null)throw Error('Session refusal remains');
     window.name=window.name.split(MARK).join('');
     if(window.name.includes(MARK))throw Error('Tab refusal remains');
   }
@@ -37,27 +37,40 @@
     const script=document.createElement('script');script.id='bwn-ga4';script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id='+ID;document.head.appendChild(script);
     window.gtag('js',new Date());window.gtag('config',ID,{allow_google_signals:false,allow_ad_personalization_signals:false});
   }
+  function rollbackGrant(){
+    try{
+      localStorage.setItem(KEY,JSON.stringify({analytics:false}));
+      if(JSON.parse(localStorage.getItem(KEY)||'null')?.analytics===false)return true;
+    }catch{}
+    try{localStorage.removeItem(KEY);return localStorage.getItem(KEY)===null;}catch{return false;}
+  }
   const checkbox=document.getElementById('analytics'),status=document.getElementById('cookie-status');
-  let retainedDenial=false,effective=false;
+  let retainedDenial=false,effective=false,grantCleared=false;
   function refresh(){effective=read()?.analytics===true;apply(effective);if(checkbox)checkbox.checked=effective;}
   function save(analytics){
-    analytics=analytics===true;
+    analytics=analytics===true;grantCleared=false;
     if(!analytics){retainedDenial=markDeny();apply(false);}
     try{
       if(analytics){clearDeny();localStorage.getItem(KEY);localStorage.setItem(KEY+'-write-check','1');localStorage.removeItem(KEY+'-write-check');}
       localStorage.setItem(KEY,JSON.stringify({analytics}));
+      if(JSON.parse(localStorage.getItem(KEY)||'null')?.analytics!==analytics)throw Error('Choice not confirmed');
       if(analytics)window.__bwnDenied=false;
-      refresh();return true;
-    }catch{retainedDenial=markDeny();refresh();return false;}
+      refresh();
+      if(analytics&&!effective)throw Error('Grant not confirmed');
+      return true;
+    }catch{
+      if(analytics)grantCleared=rollbackGrant();
+      retainedDenial=markDeny();refresh();return false;
+    }
   }
   window.bwnConsent={read,save};
   refresh();
   function choose(value){
     const stored=save(value);
     if(status)status.textContent=stored
-      ?effective?'Google Analytics dibenarkan dalam pelayar ini.':value?'Pilihan disimpan, tetapi storan tidak dapat disahkan. Google Analytics kekal tidak aktif dalam tab ini.':'Google Analytics ditolak dalam pelayar ini.'
-      :retainedDenial?'Google Analytics dimatikan dalam tab ini dan penolakan dikekalkan semasa navigasi laman serta muat semula. Pilihan kekal tidak dapat disimpan; tab lain mungkin masih menyimpan kebenaran lama. Padam data laman melalui tetapan pelayar.'
-      :'Google Analytics dimatikan pada halaman ini. Penolakan tidak dapat dikekalkan semasa navigasi atau muat semula. Padam data laman melalui tetapan pelayar untuk membuang kebenaran lama.';
+      ?effective?'Google Analytics dibenarkan dalam tab ini.':'Google Analytics ditolak dalam tab ini.'
+      :grantCleared?'Google Analytics dimatikan dalam tab ini. Kebenaran yang tidak dapat disahkan telah ditolak atau dibuang daripada storan. Semak tetapan sebelum membenarkan semula.':retainedDenial?'Google Analytics dimatikan dalam tab ini dan penolakan dikekalkan semasa navigasi laman serta muat semula. Pilihan kekal tidak dapat disimpan; kebenaran tersimpan mungkin masih ada dan boleh digunakan oleh tab lain. Padam data laman melalui tetapan pelayar.'
+      :'Google Analytics dimatikan pada halaman ini. Kebenaran tersimpan mungkin masih ada dan boleh digunakan oleh tab lain. Penolakan tidak dapat dikekalkan semasa navigasi atau muat semula. Padam data laman melalui tetapan pelayar untuk membuang sebarang kebenaran tersimpan.';
   }
   document.getElementById('save-cookie')?.addEventListener('click',()=>choose(checkbox?.checked===true));
   document.getElementById('reject-cookie')?.addEventListener('click',()=>choose(false));
