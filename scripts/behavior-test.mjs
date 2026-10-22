@@ -1,24 +1,45 @@
-import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
-import vm from 'node:vm';
-import worker from '../worker.mjs';
-let assetCalls=0;const env={ASSETS:{fetch:async()=>{assetCalls++;return new Response('missing',{status:404});}}};
-for(const u of ['http://airportbrunei.com/dasar-privasi/?q=1','https://www.airportbrunei.com/dasar-privasi/?q=1']){const r=await worker.fetch(new Request(u),env);assert.equal(r.status,301);assert.equal(r.headers.get('location'),'https://airportbrunei.com/dasar-privasi/?q=1');}
-let r=await worker.fetch(new Request('https://airportbrunei.com/tetapan-kuki?q=1'),env);assert.equal(r.headers.get('location'),'https://airportbrunei.com/tetapan-kuki/?q=1');r=await worker.fetch(new Request('https://airportbrunei.com/missing'),env);assert.equal(r.status,404);assert.equal(await r.text(),'missing');assert.match(r.headers.get('X-Robots-Tag'),/noindex/);assert.equal(assetCalls,1);
-const code=readFileSync('public/consent.js','utf8');
-let raw=JSON.stringify({analytics:true}), writable=true, session={};
-const storage={getItem:()=>raw,setItem:(k,v)=>{if(!writable)throw Error('blocked');if(k==='bwn-cookie-preferences')raw=v;},removeItem:()=>{if(!writable)throw Error('blocked');}};
-const sessionStorage={getItem:k=>session[k]||null,setItem:(k,v)=>{session[k]=v},removeItem:k=>{delete session[k]}};
-function page(name=''){const scripts=[];const window={name};const document={getElementById:id=>scripts.find(s=>s.id===id),createElement:()=>({}),head:{appendChild:s=>scripts.push(s)}};vm.runInNewContext(code,{window,document,localStorage:storage,sessionStorage});return {window,scripts};}
-let p=page();assert.equal(p.scripts.length,1);writable=false;assert.equal(p.window.bwnConsent.save(false),false);assert.equal(p.window['ga-disable-G-HXM22WWPKP'],true);
-let next=page(p.window.name);assert.equal(next.scripts.length,0);assert.equal(next.window['ga-disable-G-HXM22WWPKP'],true);assert.equal(JSON.parse(raw).analytics,true);
-// Even if session/name cannot carry the tombstone, blocked writes refuse a stale grant.
-session={};next=page();assert.equal(next.scripts.length,0);assert.equal(next.window.bwnConsent.save(true),false);assert.equal(next.scripts.length,1);assert.equal(page().scripts.length,0);
-writable=true;const chosen=page();chosen.window.bwnConsent.save(false);assert.equal(page(chosen.window.name).scripts.length,0);chosen.window.bwnConsent.save(true);assert.equal(page(chosen.window.name).scripts.length,1);
-storage.getItem=()=>{throw Error('blocked read')};assert.equal(page().scripts.length,0);
-console.log('PASS Worker 301/query/ASSETS404; consent immediate refusal, failed writes and stale grants across pages.');
-// Refusal must survive same-tab navigation even when session storage is unavailable.
-raw=JSON.stringify({analytics:true});writable=true;storage.getItem=()=>raw;
-sessionStorage.getItem=()=>{throw Error('session blocked')};sessionStorage.setItem=()=>{throw Error('session blocked')};sessionStorage.removeItem=()=>{throw Error('session blocked')};
-p=page();assert.equal(p.scripts.length,1);writable=false;p.window.bwnConsent.save(false);writable=true;next=page(p.window.name);assert.equal(next.scripts.length,0);assert.equal(next.window['ga-disable-G-HXM22WWPKP'],true);
-console.log('PASS session-storage failure: window-name veto prevents stale-grant recovery in same tab.');
+import fs from 'node:fs';import {execFileSync} from 'node:child_process';import vm from 'node:vm';import assert from 'node:assert/strict';import worker from '../worker.mjs';
+const html=fs.readFileSync('dist/404.html','utf8');let calls=0;
+const env={ASSETS:{fetch:async request=>{calls++;const path=new URL(request.url).pathname;return new Response(request.method==='HEAD'?null:path==='/__missing_error_page__'||path==='/missing'?html:'page',{status:path==='/__missing_error_page__'||path==='/missing'?404:200})}}};
+for(const path of ['/404','/404/','/404.html','/404.html/','/missing'])for(const method of ['GET','HEAD']){const r=await worker.fetch(new Request('https://airportbrunei.com'+path+'?q=a%2Fb&x=1&x=2',{method}),env);assert.equal(r.status,404);assert.match(r.headers.get('X-Robots-Tag'),/noindex/);assert.equal(r.headers.get('Location'),null);assert.equal(method==='HEAD'?(await r.text())==='':(await r.text()).includes('noindex'),true);}
+for(const url of ['http://airportbrunei.com/404.html?q=a%2Fb&x=1&x=2','https://www.airportbrunei.com/404.html?q=a%2Fb&x=1&x=2']){const r=await worker.fetch(new Request(url),env);assert.equal(r.status,301);assert.equal(r.headers.get('Location'),'https://airportbrunei.com/404.html?q=a%2Fb&x=1&x=2');}
+assert.equal((await worker.fetch(new Request('https://airportbrunei.com/tetapan-kuki?q=1'),env)).headers.get('Location'),'https://airportbrunei.com/tetapan-kuki/?q=1');assert.equal((await worker.fetch(new Request('https://airportbrunei.com/tetapan-kuki/'),env)).status,200);
+console.log('PASS actual Worker with mocked ASSETS: explicit aliases/unknown GET/HEAD404/noindex, canonical priority/path/query, page slash301 and normal200.');
+const baseline=process.argv.includes('--baseline');
+const code=baseline?execFileSync('git',['show','5e59f35:public/consent.js'],{encoding:'utf8'}):fs.readFileSync('public/consent.js','utf8');if(!baseline)assert.equal(code,fs.readFileSync('dist/consent.js','utf8'));
+const built=fs.readFileSync('dist/tetapan-kuki/index.html','utf8');assert(built.includes('<html lang="ms-BN">'));assert(/<script[^>]*src="\/consent.js"[^>]*defer/.test(built));for(const id of ['analytics','cookie-status','save-cookie','reject-cookie'])assert(built.includes(`id="${id}"`));
+const KEY='bwn-cookie-preferences',DENY='bwn-analytics-denied',MARK='|bwn-analytics-denied|',GA='ga-disable-G-HXM22WWPKP';
+function store(map=new Map()){return{map,fail:{},writes:[],getItem(k){if(this.fail.read)throw Error('read');return map.get(k)??null},setItem(k,v){if(this.fail.write)throw Error('write');this.writes.push([k,v]);map.set(k,v);if(k===KEY&&this.fail.lateRead)this.fail.read=true},removeItem(k){if(this.fail.remove)throw Error('remove');if(!this.fail.ignoreRemove)map.delete(k)}}}
+function page({local=store(),session=store(),name='',nameFail={}}={}){
+ const scripts=[],listeners={},buttons={},checkbox={checked:false},status={textContent:''};
+ const c={localStorage:local,sessionStorage:session,document:{getElementById:id=>id==='analytics'?checkbox:id==='cookie-status'?status:['save-cookie','reject-cookie'].includes(id)?{addEventListener:(_type,fn)=>buttons[id]=fn}:scripts.find(s=>s.id===id),createElement:()=>({}),head:{appendChild:s=>scripts.push(s)}},addEventListener:(type,fn)=>(listeners[type]||=[]).push(fn)};
+ Object.defineProperty(c,'name',{get(){if(nameFail.read)throw Error('name read');return name},set(v){if(nameFail.write)throw Error('name write');if(!nameFail.ignoreWrite)name=v}});c.window=c;vm.createContext(c);const initialize=()=>vm.runInContext(code,c);initialize();
+ return{c,scripts,local,session,nameFail,checkbox,status,initialize,save:()=>buttons['save-cookie'](),allow(){checkbox.checked=true;buttons['save-cookie']()},deny:()=>buttons['reject-cookie'](),event:(value,key=KEY)=>(listeners.storage||[]).forEach(fn=>fn({key,newValue:value})),reload:()=>page({local,session,name,nameFail}),allowed:()=>c[GA]===false,runtime:()=>c.dataLayer?.filter(a=>a[0]==='consent').at(-1)?.[2].analytics_storage};
+}
+if(baseline){
+ const local=store(new Map([[KEY,'{"analytics":false}']]));local.fail.read=true;const p=page({local});p.allow();assert.equal(JSON.parse(local.map.get(KEY)).analytics,true);assert.equal(p.allowed(),true);assert.equal(p.checkbox.checked,true);
+ const session=store(new Map([[DENY,'1']]));session.fail.remove=true;const b=page({local:store(new Map([[KEY,'{"analytics":false}']])),session});b.allow();assert.equal(JSON.parse(b.local.getItem(KEY)).analytics,true);assert.equal(b.checkbox.checked,true);
+ const q=page();q.allow();q.save();q.save();assert.equal(q.c.dataLayer.filter(a=>a[0]==='consent'&&a[1]==='default').length,3);
+ console.log('BASELINE reproduced: failed local read with working writes enables analytics and false effective UI; failed session refusal clear publishes shared grant; repeated Save reinitializes consent default.');process.exit(0);
+}
+let p=page();assert.equal(p.scripts.length,0);p.save();assert.equal(p.allowed(),false);p.allow();p.save();p.save();assert.equal(p.runtime(),'granted');assert.equal(p.scripts.length,1);assert.equal(p.c.dataLayer.filter(a=>a[0]==='config').length,1);assert.equal(p.c.dataLayer.filter(a=>a[0]==='consent'&&a[1]==='default').length,1);p.deny();assert.equal(p.checkbox.checked,false);p.save();assert.equal(p.runtime(),'denied');p.allow();assert.equal(p.runtime(),'granted');assert.equal(p.scripts.length,1);
+for(const allFail of [false,true]){p=page({local:store(new Map([[KEY,'{"analytics":true}']]))});assert.equal(p.scripts.length,1);p.local.fail.write=true;p.session.fail.write=allFail;p.nameFail.write=allFail;p.deny();assert.equal(p.allowed(),false);assert.equal(p.runtime(),'denied');assert.equal(p.checkbox.checked,false);assert.match(p.status.textContent,allFail?/pada halaman ini/:/dalam tab ini/);p.initialize();assert.equal(p.allowed(),false);assert.equal(p.scripts.length,1);if(!allFail)assert.equal(p.reload().scripts.length,0);}
+for(const which of ['local','session']){const local=store(new Map([[KEY,'{"analytics":true}']])),session=store();(which==='local'?local:session).fail.read=true;p=page({local,session});assert.equal(p.scripts.length,0);p.allow();assert.equal(p.allowed(),false);assert.equal(p.checkbox.checked,false);assert.equal(p.scripts.length,0);assert.doesNotMatch(p.status.textContent,/dibenarkan dalam pelayar/);}
+const shared=store(new Map([[KEY,'{"analytics":false}']])),bad=store(shared.map);bad.fail.read=true;const healthy=page({local:shared});p=page({local:bad});p.allow();healthy.event(shared.getItem(KEY));assert.equal(JSON.parse(shared.getItem(KEY)).analytics,false);assert.equal(healthy.scripts.length,0);assert.equal(p.checkbox.checked,false);
+for(const failure of ['remove','ignoreRemove']){p=page({local:store(new Map([[KEY,'{"analytics":false}']])),session:store(new Map([[DENY,'1']]))});p.session.fail[failure]=true;p.allow();assert.equal(JSON.parse(p.local.getItem(KEY)).analytics,false);assert.equal(p.allowed(),false);}
+for(const failure of ['write','ignoreWrite','read']){p=page({local:store(new Map([[KEY,'{"analytics":false}']])),name:MARK});p.nameFail[failure]=true;p.allow();assert.equal(JSON.parse(p.local.getItem(KEY)).analytics,false);assert.equal(p.allowed(),false);}
+p=page();p.allow();p.local.fail.write=true;p.session.fail.write=true;p.deny();assert(p.c.name.includes(MARK));p.local.fail.write=false;assert.equal(p.reload().scripts.length,0);
+const late=store();late.fail.lateRead=true;p=page({local:late});p.allow();assert.equal(p.allowed(),false);assert.equal(p.checkbox.checked,false);assert.match(p.status.textContent,/kekal tidak aktif/);assert.doesNotMatch(p.status.textContent,/dibenarkan dalam pelayar/);
+const local=store(),a=page({local}),b=page({local});a.allow();b.event(local.getItem(KEY));assert.equal(b.allowed(),true);a.deny();b.event(local.getItem(KEY));assert.equal(b.runtime(),'denied');assert.equal(b.checkbox.checked,false);assert.match(b.status.textContent,/dimatikan/);a.allow();b.event(local.getItem(KEY));assert.equal(b.allowed(),false);assert.match(b.status.textContent,/kekal tidak aktif/);b.allow();assert.equal(b.runtime(),'granted');assert.equal(b.scripts.length,1);local.map.clear();b.event(null,null);assert.equal(b.allowed(),false);assert.equal(b.checkbox.checked,false);
+// The UI must reflect the applied state, rather than a second independent read.
+const initiallyGranted=store(new Map([[KEY,'{"analytics":true}']]));
+let initialReads=0;const initialGet=initiallyGranted.getItem.bind(initiallyGranted);
+initiallyGranted.getItem=k=>{if(k===KEY&&++initialReads>1)throw Error('read lost after initial apply');return initialGet(k)};
+p=page({local:initiallyGranted});assert.equal(p.allowed(),true);assert.equal(p.checkbox.checked,true);assert.equal(p.runtime(),'granted');assert.equal(initialReads,1);
+const betweenReads=store();p=page({local:betweenReads});let saveReads=0;const saveGet=betweenReads.getItem.bind(betweenReads);
+betweenReads.getItem=k=>{if(k===KEY&&++saveReads>2)throw Error('read lost after saved apply');return saveGet(k)};
+p.allow();assert.equal(p.allowed(),true);assert.equal(p.checkbox.checked,true);assert.equal(p.runtime(),'granted');assert.match(p.status.textContent,/dibenarkan dalam pelayar/);assert.equal(saveReads,2);
+p.save();assert.equal(p.allowed(),false);assert.equal(p.checkbox.checked,false);assert.equal(p.runtime(),'denied');assert.doesNotMatch(p.status.textContent,/dibenarkan dalam pelayar/);
+console.log('PASS applied runtime/checkbox/feedback align when reads become unavailable after initial or saved application; next Save read failure denies immediately.');
+for(const raw of ['broken','null','{"analytics":"true"}'])assert.equal(page({local:store(new Map([[KEY,raw]]))}).scripts.length,0);
+console.log('PASS Malay actual deferred runtime and registered checkbox/buttons: default denial, repeated Save single config/library, deny/regrant, loaded old grant local/dual persistence failure, retained document and fresh session/name veto, independent local/session reads, read-fail/write-ok no shared grant/effective UI, failed or ignored veto clear, late-read feedback, separate-tab cross-storage runtime/checkbox/status, malformed values.');
